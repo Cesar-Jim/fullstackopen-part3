@@ -1,0 +1,11 @@
+{
+  "name": "fullstackopen-part3",
+  "version": "1.0.0",
+  "description": "Contains all the source code related to part3 of the fullstackopen bootcamp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cesar Jimenez",
+  "license": "MIT"
+}
