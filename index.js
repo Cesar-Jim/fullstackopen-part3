@@ -49,7 +49,7 @@ app.get("/info", (req, res) => {
 });
 
 // Fetch single resources
-app.get("/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
   const person = persons.find(p => p.id === id);
 
@@ -58,6 +58,14 @@ app.get("/persons/:id", (req, res) => {
   } else {
     res.status(404).end();
   }
+});
+
+// Delete an entry
+app.delete("/api/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+  persons = persons.filter(p => p.id !== id);
+
+  res.status(204).end();
 });
 
 const PORT = 3001;
