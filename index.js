@@ -18,11 +18,18 @@ let persons = [
     id: 3
   },
   {
+    name: "Cesar Jimenez",
+    number: "44-44-4444",
+    id: 4
+  },
+  {
     name: "Mary Poppendieck",
     number: "39-23-6423122",
-    id: 4
+    id: 5
   }
 ];
+
+const now = new Date();
 
 app.get("/", (req, res) => {
   res.send("<h1>Hello!</h1>");
@@ -30,6 +37,12 @@ app.get("/", (req, res) => {
 
 app.get("/api/persons", (req, res) => {
   res.json(persons);
+});
+
+app.get("/info", (req, res) => {
+  res.send(
+    `<p>Phonebook has info for ${persons.length} people.</p><p>${now}</p>`
+  );
 });
 
 const PORT = 3001;
