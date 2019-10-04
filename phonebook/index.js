@@ -108,7 +108,7 @@ app.post("/api/persons", (req, res) => {
 
     res.status(422).end();
   } else {
-    // Successful pdata processing
+    // Successful data processing
     const person = req.body;
 
     person.id = Math.floor(Math.random() * 1000);
