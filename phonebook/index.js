@@ -1,8 +1,12 @@
 const express = require("express");
 const app = express();
+
 const bodyParser = require("body-parser");
 
+const morgan = require("morgan");
+
 app.use(bodyParser.json());
+app.use(morgan("tiny"));
 
 let persons = [
   {
@@ -33,7 +37,7 @@ let persons = [
 ];
 
 const errorMessage = {
-  message: "",
+  error: "",
   code: 0
 };
 
@@ -85,14 +89,14 @@ app.post("/api/persons", (req, res) => {
   if (nameExists) {
     // Error handling if name already exists. Error code 422 is thrown...
     errorMessage.code = 422;
-    errorMessage.message = "Unprocessable entity. Duplicate data.";
+    errorMessage.error = "Unprocessable entity. Duplicate data.";
     console.log(errorMessage);
 
     res.status(422).end();
   } else if (newName === "" || newNumber === "") {
     // Error handling if name or number fields are empty. Error code 422 is thrown...
     errorMessage.code = 422;
-    errorMessage.message =
+    errorMessage.error =
       "Unprocessable entity. Empty fields are not acceptable.";
     console.log(errorMessage);
 
