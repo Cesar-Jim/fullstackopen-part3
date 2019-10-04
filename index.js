@@ -32,6 +32,11 @@ let persons = [
   }
 ];
 
+const errorMessage = {
+  message: "",
+  code: 0
+};
+
 const now = new Date();
 
 // Fetch home
@@ -73,11 +78,33 @@ app.delete("/api/persons/:id", (req, res) => {
 
 // Add an entry
 app.post("/api/persons", (req, res) => {
-  const person = req.body;
+  const newName = req.body.name;
+  const newNumber = req.body.number;
+  const nameExists = persons.find(p => p.name === newName) ? true : false;
 
-  person.id = Math.floor(Math.random() * 1000);
-  persons = persons.concat(person);
-  res.json(person);
+  if (nameExists) {
+    // Error handling if name already exists. Error code 422 is thrown...
+    errorMessage.code = 422;
+    errorMessage.message = "Unprocessable entity. Duplicate data.";
+    console.log(errorMessage);
+
+    res.status(422).end();
+  } else if (newName === "" || newNumber === "") {
+    // Error handling if name or number fields are empty. Error code 422 is thrown...
+    errorMessage.code = 422;
+    errorMessage.message =
+      "Unprocessable entity. Empty fields are not acceptable.";
+    console.log(errorMessage);
+
+    res.status(422).end();
+  } else {
+    // Successful pdata processing
+    const person = req.body;
+
+    person.id = Math.floor(Math.random() * 1000);
+    persons = persons.concat(person);
+    res.json(person);
+  }
 });
 
 const PORT = 3001;
