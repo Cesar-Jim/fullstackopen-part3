@@ -4,6 +4,7 @@ const app = express();
 const bodyParser = require("body-parser");
 
 const morgan = require("morgan");
+const cors = require("cors");
 
 morgan.token("data", (req, res) => {
   return JSON.stringify(req.body);
@@ -13,6 +14,7 @@ app.use(bodyParser.json());
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time :data")
 );
+app.use(cors());
 
 let persons = [
   {
@@ -98,7 +100,7 @@ app.post("/api/persons", (req, res) => {
     errorMessage.error = "Unprocessable entity. Duplicate data.";
     console.log(errorMessage);
 
-    res.status(422).end();
+    return res.status(422).end();
   } else if (newName === "" || newNumber === "") {
     // Error handling if name or number fields are empty. Error code 422 is thrown...
     errorMessage.code = 422;
@@ -106,7 +108,7 @@ app.post("/api/persons", (req, res) => {
       "Unprocessable entity. Empty fields are not acceptable.";
     console.log(errorMessage);
 
-    res.status(422).end();
+    return res.status(422).end();
   } else {
     // Successful data processing
     const person = req.body;
