@@ -15,6 +15,7 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time :data")
 );
 app.use(cors());
+app.use(express.static("build"));
 
 let persons = [
   {
@@ -78,6 +79,8 @@ app.get("/api/persons/:id", (req, res) => {
   } else {
     res.status(404).end();
   }
+
+  res.json(person);
 });
 
 // Delete an entry
