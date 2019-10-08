@@ -1,38 +1,47 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 if (process.argv.length < 3) {
-  console.log("give password as argument");
+  console.log('give password as argument');
   process.exit(1);
 }
 
 const password = process.argv[2];
-const uri = `mongodb+srv://cesar:${password}@cluster0-ihtyc.mongodb.net/test?retryWrites=true&w=majority`;
+
+const url = `mongodb+srv://cesar:${password}@cluster0-ihtyc.mongodb.net/note-app?retryWrites=true&w=majority`;
 const options = {
   keepAlive: 1,
   useUnifiedTopology: true,
-  useNewUrlParser: true
+  useNewUrlParser: true,
 };
 
-mongoose
-  .connect(uri, options)
-  .then(() => console.log("connected"))
-  .catch(error => console.log(error));
+mongoose.connect(url, options);
 
+// Schema
 const noteSchema = new mongoose.Schema({
   content: String,
   date: Date,
-  important: Boolean
+  important: Boolean,
 });
 
-const Note = mongoose.model("Note", noteSchema);
+// Model
+const Note = mongoose.model('Note', noteSchema);
 
 const note = new Note({
-  content: "HTML is Easy",
+  content: 'Mongo creates non-relational databases',
   date: new Date(),
-  important: true
+  important: false,
 });
 
-note.save().then(response => {
-  console.log("note saved!");
+// Generate (save) a note
+// note.save().then(response => {
+//   console.log('note saved!');
+//   mongoose.connection.close();
+// });
+
+// Fetch notes from the Mongo Database
+Note.find({ important: true }).then(result => {
+  result.forEach(note => {
+    console.log(note);
+  });
   mongoose.connection.close();
 });
