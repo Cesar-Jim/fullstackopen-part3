@@ -41,9 +41,10 @@ const saveData = item => {
 
 // Fetch persons from the persons collection:
 const fetchData = model => {
+  console.log('Phonebook:');
   model.find().then(result => {
-    result.forEach(note => {
-      console.log(note);
+    result.forEach(record => {
+      console.log(`${record.name} ${record.number}`);
     });
 
     mongoose.connection.close();
@@ -59,7 +60,7 @@ if (process.argv.length < 3 || process.argv.length > 5) {
 
 if (process.argv.length === 3) {
   console.log(
-    'To add a new record please type: "node mongo.js <password> <name> <number>"\n\nFETCHING DATA...\n\n'
+    'To add a new record please type: "node mongo.js <password> <name> <number>"\n\nFETCHING DATA...\n'
   );
 
   fetchData(Person);
