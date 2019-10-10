@@ -20,34 +20,6 @@ const requestLogger = (request, response, next) => {
 
 app.use(requestLogger);
 
-// const url = `mongodb+srv://cesar:wrongPassword@cluster0-ihtyc.mongodb.net/note-app?retryWrites=true&w=majority`;
-// const options = {
-//   keepAlive: 1,
-//   useUnifiedTopology: true,
-//   useNewUrlParser: true,
-// };
-
-// mongoose.connect(url, options);
-
-// // Schema
-// const noteSchema = new mongoose.Schema({
-//   content: String,
-//   date: Date,
-//   important: Boolean,
-// });
-
-// // Format the schema
-// noteSchema.set('toJSON', {
-//   transform: (document, returnedObject) => {
-//     returnedObject.id = returnedObject._id.toString();
-//     delete returnedObject._id;
-//     delete returnedObject.__v;
-//   },
-// });
-
-// Model
-// const Note = mongoose.model('Note', noteSchema);
-
 let notes = [
   {
     id: 1,

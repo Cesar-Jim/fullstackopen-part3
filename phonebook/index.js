@@ -1,42 +1,26 @@
 const express = require('express');
 const app = express();
-const mongoose = require('mongoose');
-
+require('dotenv').config();
 const bodyParser = require('body-parser');
 
-const morgan = require('morgan');
+const Person = require('./models/person');
+
+app.use(bodyParser.json());
 const cors = require('cors');
+
+app.use(cors());
+
+const morgan = require('morgan');
 
 morgan.token('data', (req, res) => {
   return JSON.stringify(req.body);
 });
 
-app.use(bodyParser.json());
 app.use(
   morgan(':method :url :status :res[content-length] - :response-time :data'),
 );
-app.use(cors());
+
 app.use(express.static('build'));
-
-// DB related code
-const url =
-  'mongodb+srv://cesar:soccer002@cluster0-ihtyc.mongodb.net/phonebook-app?retryWrites=true&w=majority';
-const options = {
-  keepAlive: 1,
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-};
-
-mongoose.connect(url, options);
-
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-});
-
-const Person = mongoose.model('Person', personSchema);
-
-// End of DB related code
 
 let persons = [
   {
@@ -81,7 +65,7 @@ app.get('/', (req, res) => {
 // Fetch list of all persons
 app.get('/api/persons', (req, res) => {
   Person.find({}).then(persons => {
-    res.json(persons);
+    res.json(persons.map(person => person.toJSON()));
   });
 });
 
@@ -94,16 +78,9 @@ app.get('/info', (req, res) => {
 
 // Fetch single resources
 app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find(p => p.id === id);
-
-  if (person) {
-    res.json(person);
-  } else {
-    res.status(404).end();
-  }
-
-  res.json(person);
+  Person.findById(req.params.id).then(person => {
+    res.json(person.toJSON());
+  });
 });
 
 // Delete an entry
@@ -116,36 +93,23 @@ app.delete('/api/persons/:id', (req, res) => {
 
 // Add an entry
 app.post('/api/persons', (req, res) => {
-  const newName = req.body.name;
-  const newNumber = req.body.number;
-  const nameExists = persons.find(p => p.name === newName) ? true : false;
+  const body = req.body;
 
-  if (nameExists) {
-    // Error handling if name already exists. Error code 422 is thrown...
-    errorMessage.code = 422;
-    errorMessage.error = 'Unprocessable entity. Duplicate data.';
-    console.log(errorMessage);
-
-    return res.status(422).end();
-  } else if (newName === '' || newNumber === '') {
-    // Error handling if name or number fields are empty. Error code 422 is thrown...
-    errorMessage.code = 422;
-    errorMessage.error =
-      'Unprocessable entity. Empty fields are not acceptable.';
-    console.log(errorMessage);
-
-    return res.status(422).end();
-  } else {
-    // Successful data processing
-    const person = req.body;
-
-    person.id = Math.floor(Math.random() * 1000);
-    persons = persons.concat(person);
-    res.json(person);
+  if (body.name === undefined) {
+    return res.status(400).json({ error: 'content missing' });
   }
+
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  });
+
+  person.save().then(savedPerson => {
+    res.json(savedPerson.toJSON());
+  });
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
