@@ -4,6 +4,8 @@ const url = process.env.MONGODB_URI;
 
 console.log(`Conecting to ${url}`);
 
+mongoose.set('useFindAndModify', false);
+
 const options = {
   keepAlive: 1,
   useUnifiedTopology: true,
