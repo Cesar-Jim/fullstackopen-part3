@@ -20,8 +20,6 @@ app.use(
   morgan(':method :url :status :res[content-length] - :response-time :data'),
 );
 
-app.use(express.static('build'));
-
 let persons = [
   {
     name: 'Arto Hellas',
@@ -50,6 +48,8 @@ let persons = [
   },
 ];
 
+app.use(express.static('build'));
+
 const errorMessage = {
   error: '',
   code: 0,
@@ -60,34 +60,6 @@ const now = new Date();
 // Fetch home
 app.get('/', (req, res) => {
   res.send('<h1>Hello!</h1>');
-});
-
-// Fetch list of all persons
-app.get('/api/persons', (req, res) => {
-  Person.find({}).then(persons => {
-    res.json(persons.map(person => person.toJSON()));
-  });
-});
-
-// Fetch info
-app.get('/info', (req, res) => {
-  res.send(
-    `<p>Phonebook has info for ${persons.length} people.</p><p>${now}</p>`,
-  );
-});
-
-// Fetch single resources
-app.get('/api/persons/:id', (req, res) => {
-  Person.findById(req.params.id).then(person => {
-    res.json(person.toJSON());
-  });
-});
-
-// Delete an entry
-app.delete('/api/persons/:id', (req, res, next) => {
-  Person.findByIdAndRemove(req.params.id).then(result => {
-    res.status(204).end();
-  }).catch(error => next(error));
 });
 
 // Add an entry
@@ -107,6 +79,56 @@ app.post('/api/persons', (req, res) => {
     res.json(savedPerson.toJSON());
   });
 });
+
+// Fetch list of all persons
+app.get('/api/persons', (req, res) => {
+  Person.find({}).then(persons => {
+    res.json(persons.map(person => person.toJSON()));
+  });
+});
+
+// Fetch single resources
+app.get('/api/persons/:id', (req, res, next) => {
+  Person.findById(req.params.id).then(person => {
+    if (person) {
+      res.json(person.toJSON());
+    } else {
+      res.status(404).end();
+    }
+  }).catch(error => next(error));
+});
+
+// Fetch info
+app.get('/info', (req, res) => {
+  res.send(
+    `<p>Phonebook has info for ${persons.length} people.</p><p>${now}</p>`,
+  );
+});
+
+// Delete an entry
+app.delete('/api/persons/:id', (req, res, next) => {
+  Person.findByIdAndRemove(req.params.id).then(result => {
+    res.status(204).end();
+  }).catch(error => next(error));
+});
+
+const unkownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unkownEndpoint);
+
+const errorHandler = (error, req, res, next) => {
+  console.log(error.message);
+
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
+    return res.status(400).send({ error: 'malformed id' });
+  }
+
+  next(error);
+}
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 
