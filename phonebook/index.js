@@ -20,33 +20,33 @@ app.use(
   morgan(':method :url :status :res[content-length] - :response-time :data'),
 );
 
-let persons = [
-  {
-    name: 'Arto Hellas',
-    number: '040-123456',
-    id: 1,
-  },
-  {
-    name: 'Ada Lovelace',
-    number: '39-44-5323523',
-    id: 2,
-  },
-  {
-    name: 'Dan Abramov',
-    number: '12-43-234345',
-    id: 3,
-  },
-  {
-    name: 'Cesar Jimenez',
-    number: '44-44-4444',
-    id: 4,
-  },
-  {
-    name: 'Mary Poppendieck',
-    number: '39-23-6423122',
-    id: 5,
-  },
-];
+// let persons = [
+//   {
+//     name: 'Arto Hellas',
+//     number: '040-123456',
+//     id: 1,
+//   },
+//   {
+//     name: 'Ada Lovelace',
+//     number: '39-44-5323523',
+//     id: 2,
+//   },
+//   {
+//     name: 'Dan Abramov',
+//     number: '12-43-234345',
+//     id: 3,
+//   },
+//   {
+//     name: 'Cesar Jimenez',
+//     number: '44-44-4444',
+//     id: 4,
+//   },
+//   {
+//     name: 'Mary Poppendieck',
+//     number: '39-23-6423122',
+//     id: 5,
+//   },
+// ];
 
 app.use(express.static('build'));
 
@@ -57,12 +57,12 @@ const errorMessage = {
 
 const now = new Date();
 
-// Fetch home
+// Fetch home (could be a landing page)
 app.get('/', (req, res) => {
   res.send('<h1>Hello!</h1>');
 });
 
-// Add an entry
+// Add a resource
 app.post('/api/persons', (req, res) => {
   const body = req.body;
 
@@ -75,27 +75,35 @@ app.post('/api/persons', (req, res) => {
     number: body.number,
   });
 
-  person.save().then(savedPerson => {
-    res.json(savedPerson.toJSON());
-  });
+  person
+    .save()
+    .then(savedPerson => {
+      res.json(savedPerson.toJSON());
+    })
+    .catch(err => {
+      console.log(err);
+      return res.status(409).json({ error: 'duplicate names are not allowed' });
+    });
 });
 
-// Fetch list of all persons
+// Fetch list of all resources
 app.get('/api/persons', (req, res) => {
   Person.find({}).then(persons => {
     res.json(persons.map(person => person.toJSON()));
   });
 });
 
-// Fetch single resources
+// Fetch a single resource
 app.get('/api/persons/:id', (req, res, next) => {
-  Person.findById(req.params.id).then(person => {
-    if (person) {
-      res.json(person.toJSON());
-    } else {
-      res.status(404).end();
-    }
-  }).catch(error => next(error));
+  Person.findById(req.params.id)
+    .then(person => {
+      if (person) {
+        res.json(person.toJSON());
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch(error => next(error));
 });
 
 // Modify a resource
@@ -104,12 +112,14 @@ app.put('/api/persons/:id', (req, res, next) => {
 
   const person = {
     name: body.name,
-    number: body.number
+    number: body.number,
   };
 
-  Person.findByIdAndUpdate(req.params.id, person, { new: true }).then(updatedPerson => {
-    res.json(updatedPerson.toJSON());
-  }).catch(error => next(error))
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then(updatedPerson => {
+      res.json(updatedPerson.toJSON());
+    })
+    .catch(error => next(error));
 });
 
 // Fetch info
@@ -119,16 +129,18 @@ app.get('/info', (req, res) => {
   );
 });
 
-// Delete an entry
+// Delete a resource
 app.delete('/api/persons/:id', (req, res, next) => {
-  Person.findByIdAndRemove(req.params.id).then(result => {
-    res.status(204).end();
-  }).catch(error => next(error));
+  Person.findByIdAndRemove(req.params.id)
+    .then(result => {
+      res.status(204).end();
+    })
+    .catch(error => next(error));
 });
 
 const unkownEndpoint = (req, res) => {
-  res.status(404).send({ error: 'unknown endpoint' })
-}
+  res.status(404).send({ error: 'unknown endpoint' });
+};
 
 app.use(unkownEndpoint);
 
@@ -140,7 +152,7 @@ const errorHandler = (error, req, res, next) => {
   }
 
   next(error);
-}
+};
 
 app.use(errorHandler);
 
