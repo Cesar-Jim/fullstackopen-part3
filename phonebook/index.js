@@ -82,7 +82,7 @@ app.post('/api/persons', (req, res) => {
     })
     .catch(err => {
       console.log(err);
-      return res.status(409).json({ error: 'duplicate names are not allowed' });
+      return res.status(409).send({ error: 'duplicate names are not allowed' });
     });
 });
 
