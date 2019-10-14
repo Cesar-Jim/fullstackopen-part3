@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
+mongoose.set('useFindAndModify', false);
+
 const url = process.env.MONGODB_URI;
 
+console.log('typeOf(url', typeof url);
 console.log(`Conecting to ${url}`);
-
-mongoose.set('useFindAndModify', false);
 
 const options = {
   keepAlive: 1,
