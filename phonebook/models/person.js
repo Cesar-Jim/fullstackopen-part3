@@ -3,14 +3,15 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 const url = process.env.MONGODB_URI;
 
-console.log(`Connecting to ${url}`);
-
 mongoose.set('useFindAndModify', false);
+
+console.log(`Connecting to ${url}`);
 
 const options = {
   keepAlive: 1,
   useUnifiedTopology: true,
   useNewUrlParser: true,
+  useCreateIndex: true,
 };
 
 mongoose
@@ -23,8 +24,16 @@ mongoose
   });
 
 const personSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-  number: { type: String, required: true },
+  name: { type: String, minlength: 3, required: true, unique: true },
+  number: {
+    type: String,
+    validate: {
+      validator: function(v) {
+        return /(\D*\d){8}/.test(v);
+      },
+    },
+    required: true,
+  },
 });
 
 personSchema.plugin(uniqueValidator);
